@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../app/routes';
 import { useJourney } from '../../context/JourneyContext';
 import { careerService } from '../../services/careerService';
+import { simulationsData } from '../../data/simulations';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Alert } from '../../components/ui/Alert';
@@ -15,7 +16,7 @@ const DIMENSION_LABELS = {
   interests: 'Intereses',
   skills: 'Habilidades',
   values: 'Valores',
-  workPreferences: 'Estilo de Trabajo',
+  workPreferences: 'Estilo de trabajo',
   expectations: 'Expectativas'
 };
 
@@ -82,6 +83,12 @@ export default function ExplorePage() {
           {careers.map((career, idx) => {
             const isComparing = state.compareList.includes(career.id);
             const canCompare = state.compareList.length < 3 || isComparing;
+            const hasAvailableCase = simulationsData.some(sim => sim.careerId === career.id && sim.status === 'available');
+            const strongestMatches = Object.keys(DIMENSION_LABELS)
+              .map(key => ({ key, gap: Math.abs((state.studentScores[key] ?? 3) - (career.profile[key] ?? 3)) }))
+              .sort((a, b) => a.gap - b.gap)
+              .slice(0, 2)
+              .map(item => DIMENSION_LABELS[item.key].toLowerCase());
             
             return (
               <Card key={career.id} className="p-6 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
@@ -93,8 +100,8 @@ export default function ExplorePage() {
                   <p className="text-slate-600 text-sm mb-4">{career.description}</p>
                   
                   <div className="bg-slate-50 rounded-lg p-3 text-sm text-slate-700 border border-slate-100 italic">
-                    "{career.name} aparece entre tus alternativas porque presentas interés alto en las dimensiones requeridas y compartes el perfil de habilidades."
-                    <span className="text-xs text-slate-400 block mt-1">(Explicación referencial)</span>
+                    Tus respuestas se acercan más al perfil de ejemplo de esta carrera en {strongestMatches.join(' y ')}.
+                    <span className="text-xs text-slate-400 block mt-1">Perfil de ejemplo aún sin validación profesional.</span>
                   </div>
                 </div>
                 
@@ -106,7 +113,7 @@ export default function ExplorePage() {
                   
                   <div className="flex flex-col gap-2 w-full">
                     <Button onClick={() => handleTestCareer(career.id)} className="w-full text-sm h-9">
-                      Probar carrera
+                      {hasAvailableCase ? 'Probar un caso' : 'Ver casos disponibles'}
                     </Button>
                     <Button 
                       variant={isComparing ? "secondary" : "outline"} 

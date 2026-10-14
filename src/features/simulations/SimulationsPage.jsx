@@ -32,7 +32,7 @@ export default function SimulationsPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <SectionHeader 
         title="Prueba la Carrera" 
-        description="Vive simulaciones reales de los problemas que enfrentan los profesionales en su día a día. Una experiencia vale más que mil descripciones."
+        description="Explora casos breves inspirados en tareas profesionales. Son una primera aproximación, no una representación completa de una carrera."
         action={
           Object.keys(state.completedSimulations).length > 0 && (
             <Button onClick={() => navigate(ROUTES.COMPARE)}>

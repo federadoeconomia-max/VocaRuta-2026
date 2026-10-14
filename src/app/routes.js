@@ -3,7 +3,6 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/registro',
   PRICING: '/planes',
-  SCHOOL: '/colegio',
   DASHBOARD: '/app',
   ASSESSMENT: '/app/conocete',
   EXPLORE: '/app/explora',

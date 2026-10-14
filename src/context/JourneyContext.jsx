@@ -1,4 +1,6 @@
-import { createContext, useReducer, useContext } from 'react';
+import { createContext, useReducer, useContext, useEffect } from 'react';
+
+const STORAGE_KEY = 'vocaruta-journey-v1';
 
 const initialState = {
   currentStage: 1, // 1 to 5
@@ -12,6 +14,15 @@ const initialState = {
 };
 
 const JourneyContext = createContext();
+
+function loadJourney() {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY));
+    return saved && typeof saved === 'object' ? { ...initialState, ...saved } : initialState;
+  } catch {
+    return initialState;
+  }
+}
 
 function journeyReducer(state, action) {
   switch (action.type) {
@@ -70,7 +81,11 @@ function journeyReducer(state, action) {
 }
 
 export function JourneyProvider({ children }) {
-  const [state, dispatch] = useReducer(journeyReducer, initialState);
+  const [state, dispatch] = useReducer(journeyReducer, initialState, loadJourney);
+
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [state]);
 
   return (
     <JourneyContext.Provider value={{ state, dispatch }}>

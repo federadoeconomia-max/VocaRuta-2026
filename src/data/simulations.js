@@ -10,7 +10,7 @@ export const simulationsData = [
       {
         id: 'step1',
         type: 'intro',
-        content: 'Eres el analista principal del Banco Central. El país enfrenta una inflación del 8% (muy por encima de la meta del 3%), pero al mismo tiempo el desempleo acaba de subir al 7%.',
+        content: 'Caso ficticio: colaboras con el banco central de un país imaginario. La inflación llegó a 8% y el desempleo subió a 7%. El equipo debe discutir qué información falta y qué riesgos implica cada medida.',
       },
       {
         id: 'step2',
@@ -67,19 +67,37 @@ export const simulationsData = [
   {
     id: 'sim-der',
     careerId: 'derecho',
-    title: 'Argumentos de defensa en un caso de contrato',
-    duration: '20 min',
-    difficulty: 'Alta',
-    status: 'upcoming',
-    steps: []
+    title: 'Analiza un desacuerdo en un contrato',
+    duration: '10 min',
+    difficulty: 'Media',
+    status: 'available',
+    steps: [
+      { id: 'step1', type: 'intro', content: 'Caso ficticio: una tienda prometió entregar una laptop el lunes. El contrato escrito indica entrega dentro de cinco días hábiles. La persona compradora solicita cancelar la compra el martes porque necesita el equipo para estudiar.' },
+      { id: 'step2', type: 'data', content: 'El anuncio mencionaba «entrega rápida», pero no una fecha exacta. La tienda ofrece entregar el jueves. Antes de opinar, distingue qué dice el contrato y qué información falta.' },
+      { id: 'step3', type: 'decision', content: '¿Qué harías primero para analizar el caso con cuidado?', options: [
+        { id: 'opt1', text: 'Revisar la fecha de compra, el comprobante, el contrato y los mensajes de la oferta.' },
+        { id: 'opt2', text: 'Afirmar que la tienda incumplió sin revisar documentos.' },
+        { id: 'opt3', text: 'Ignorar el anuncio porque solo importa el contrato.' }
+      ] },
+      { id: 'step4', type: 'feedback', content: 'En Derecho importa separar hechos, documentos e interpretaciones antes de construir un argumento. Este caso ficticio solo explora una tarea y no ofrece asesoría legal.' }
+    ]
   },
   {
     id: 'sim-ind',
     careerId: 'industrial',
     title: 'Reorganiza una línea de ensamblaje',
-    duration: '15 min',
+    duration: '10 min',
     difficulty: 'Media',
-    status: 'upcoming',
-    steps: []
+    status: 'available',
+    steps: [
+      { id: 'step1', type: 'intro', content: 'Caso ficticio: un taller arma kits escolares en tres estaciones. Preparar piezas tarda 4 minutos por kit, ensamblar 8 minutos y revisar 3 minutos.' },
+      { id: 'step2', type: 'data', content: 'Cada estación tiene una persona. Los kits se mueven de una estación a la siguiente. En la segunda estación se acumula trabajo mientras las otras esperan.' },
+      { id: 'step3', type: 'decision', content: '¿Qué cambio probarías primero para reducir el cuello de botella?', options: [
+        { id: 'opt1', text: 'Medir el proceso y probar apoyo temporal en el ensamblaje, que tarda más.' },
+        { id: 'opt2', text: 'Acelerar la revisión, aunque ya tarda menos que el ensamblaje.' },
+        { id: 'opt3', text: 'Comprar más material sin medir el tiempo de cada estación.' }
+      ] },
+      { id: 'step4', type: 'feedback', content: 'La ingeniería industrial observa tiempos y restricciones para probar mejoras. Una decisión requiere medir resultados y considerar calidad, seguridad y recursos.' }
+    ]
   }
 ];

@@ -2,214 +2,158 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../app/routes';
 import { useJourney } from '../../context/JourneyContext';
+import { simulationsData } from '../../data/simulations';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { SectionHeader } from '../../components/ui/SectionHeader';
-import { Modal } from '../../components/ui/Modal';
-import { Download, Share2, Compass, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
-import { clsx } from 'clsx';
+import { Download, Compass, CheckCircle2, ArrowRight } from 'lucide-react';
+
+const responseLabel = value => {
+  if (value == null) return 'Sin respuesta';
+  if (value >= 4) return 'Sí';
+  if (value <= 2) return 'Todavía no';
+  return 'Tengo dudas';
+};
 
 export default function ReportPage() {
   const { state, dispatch } = useJourney();
   const navigate = useNavigate();
-  
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [finalCertainty, setFinalCertainty] = useState(state.finalCertainty || null);
-
+  const [finalCertainty, setFinalCertainty] = useState(state.finalCertainty);
   const topCareers = state.recommendedCareers.slice(0, 3);
-  const initialCertainty = state.initialCertainty || 0;
+  const completed = simulationsData.filter(sim => state.completedSimulations[sim.id]);
 
-  const handleCertaintyChange = (val) => {
-    setFinalCertainty(val);
-    dispatch({ type: 'SET_FINAL_CERTAINTY', payload: val });
+  const handleCertaintyChange = value => {
+    setFinalCertainty(value);
+    dispatch({ type: 'SET_FINAL_CERTAINTY', payload: value });
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
+  if (topCareers.length === 0) {
+    return (
+      <Card className="p-8 text-center my-12">
+        <h1 className="text-2xl font-bold text-slate-900 mb-3">Primero completa el cuestionario</h1>
+        <p className="text-slate-600 mb-6">Después podrás revisar alternativas y crear tu reporte personal.</p>
+        <Button onClick={() => navigate(ROUTES.ASSESSMENT)}>Ir al cuestionario</Button>
+      </Card>
+    );
+  }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-16">
-      
-      {/* Header and Print Controls - Hidden when printing */}
+    <div className="space-y-8 pb-16 print:space-y-6">
       <div className="print:hidden">
-        <SectionHeader 
-          title="Tu ruta personal" 
-          description="Has completado todas las etapas de VocaRuta. Aquí tienes el resumen de tu proceso y los siguientes pasos."
-          action={
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setShowShareModal(true)}>
-                <Share2 className="w-4 h-4 mr-2" /> Compartir
-              </Button>
-              <Button onClick={handlePrint}>
-                <Download className="w-4 h-4 mr-2" /> Descargar PDF
-              </Button>
-            </div>
-          }
+        <SectionHeader
+          title="Tu reporte de exploración"
+          description="Resume lo que exploraste y tus próximos pasos. Es una guía personal, no una decisión automática ni un diagnóstico."
+          action={<Button onClick={() => window.print()}><Download className="w-4 h-4 mr-2" /> Guardar o imprimir PDF</Button>}
         />
       </div>
 
-      {/* Print-only Header */}
-      <div className="hidden print:block text-center mb-8 border-b border-slate-200 pb-6">
-        <h1 className="text-3xl font-bold text-slate-900">Reporte Vocacional VocaRuta</h1>
-        <p className="text-slate-500 mt-2">Documento generado para Estudiante (Ejemplo)</p>
+      <div className="hidden print:block text-center border-b border-slate-200 pb-5">
+        <h1 className="text-3xl font-bold text-slate-900">VocaRuta · Mi reporte</h1>
+        <p className="text-slate-600 mt-2">Guía personal de exploración vocacional</p>
       </div>
 
-      {/* Top 3 Careers */}
-      <div>
-        <h3 className="text-xl font-bold text-slate-900 mb-4 print:text-2xl">Alternativas Recomendadas</h3>
-        <div className="space-y-6">
-          {topCareers.map((career, idx) => {
-            const simId = `sim-${career.id.substring(0,3)}`;
-            const hasSim = state.completedSimulations[simId];
-            
-            return (
-              <Card key={career.id} className="p-6 md:p-8 flex flex-col md:flex-row gap-8 border-slate-200 shadow-sm print:shadow-none print:border-slate-300">
-                <div className="shrink-0 flex flex-col items-center justify-center md:w-32">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 font-bold text-xl mb-3 border-4 border-white shadow-sm ring-1 ring-primary-50">
-                    #{idx + 1}
-                  </div>
-                  <div className="text-2xl font-bold text-primary-600">{career.compatibility}%</div>
-                  <span className="text-xs text-slate-500 uppercase tracking-wider">Afinidad</span>
-                </div>
-                
-                <div className="flex-grow">
-                  <h4 className="text-2xl font-bold text-slate-900 mb-2">{career.name}</h4>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <div>
-                      <h5 className="font-semibold text-slate-900 flex items-center gap-2 mb-2">
-                        <CheckCircle2 className="w-4 h-4 text-success-500" /> Por qué encaja contigo
-                      </h5>
-                      <p className="text-sm text-slate-600">
-                        Muestra alta coincidencia con tus intereses principales y tus expectativas de estilo de trabajo. Además, el perfil coincide con tus valores declarados.
-                      </p>
-                    </div>
-                    <div>
-                      <h5 className="font-semibold text-slate-900 flex items-center gap-2 mb-2">
-                        <AlertTriangle className="w-4 h-4 text-warning-500" /> Experiencia Práctica
-                      </h5>
-                      <p className="text-sm text-slate-600">
-                        {hasSim 
-                          ? "Completaste la simulación práctica con resultados positivos que validaron tu interés." 
-                          : "Aún no has realizado la simulación práctica para esta carrera. Recomendamos hacerla."}
-                      </p>
-                    </div>
-                  </div>
+      <Card className="p-6 md:p-8 print:shadow-none">
+        <h2 className="text-xl font-bold text-slate-900 mb-3">Qué exploraste</h2>
+        <p className="text-slate-700">
+          Respondiste un cuestionario inicial, revisaste alternativas de carrera y completaste {completed.length} {completed.length === 1 ? 'caso' : 'casos'} de exploración. Seleccionaste {state.compareList.length} {state.compareList.length === 1 ? 'carrera' : 'carreras'} para comparar.
+        </p>
+        <p className="text-sm text-slate-500 mt-3">Los porcentajes de afinidad provienen de un modelo inicial basado en respuestas declaradas. No predicen desempeño, ingresos ni permanencia en una carrera.</p>
+      </Card>
 
-                  <div className="mt-6 pt-6 border-t border-slate-100">
-                    <h5 className="font-semibold text-slate-900 mb-3">Siguientes pasos recomendados:</h5>
-                    <ul className="space-y-2">
-                      <li className="flex gap-2 text-sm text-slate-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1.5 shrink-0" />
-                        Conversa con un estudiante o profesional joven de {career.name}.
-                      </li>
-                      <li className="flex gap-2 text-sm text-slate-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1.5 shrink-0" />
-                        Revisa la malla curricular de las 3 universidades de tu interés.
-                      </li>
-                      <li className="flex gap-2 text-sm text-slate-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1.5 shrink-0" />
-                        Asiste a la próxima feria vocacional para conversar con facultades.
-                      </li>
-                    </ul>
-                  </div>
+      <section>
+        <h2 className="text-xl font-bold text-slate-900 mb-4">Alternativas para seguir investigando</h2>
+        <div className="space-y-4">
+          {topCareers.map((career, index) => {
+            const simulation = simulationsData.find(sim => sim.careerId === career.id);
+            const result = simulation && state.completedSimulations[simulation.id];
+            return (
+              <Card key={career.id} className="p-6 print:shadow-none break-inside-avoid">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                  <h3 className="text-lg font-bold text-slate-900">{index + 1}. {career.name}</h3>
+                  <span className="text-sm font-semibold text-primary-700">Afinidad inicial: {career.compatibility}%</span>
+                </div>
+                <p className="text-sm text-slate-600">{career.description}</p>
+                <div className="mt-4 pt-4 border-t border-slate-100 text-sm">
+                  {result ? (
+                    <p className="text-slate-700">
+                      Caso completado: {simulation.title}. ¿Disfrutaste la actividad? <strong>{responseLabel(result.answers?.enjoy ?? result.enjoy)}</strong>. ¿Te gustaría aprender más? <strong>{responseLabel(result.answers?.learn ?? result.learn)}</strong>.
+                    </p>
+                  ) : (
+                    <p className="text-slate-600">Todavía no probaste un caso de esta carrera{simulation?.status === 'upcoming' ? '; este caso aún no está disponible' : ''}.</p>
+                  )}
                 </div>
               </Card>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* Certainty Evolution - Hidden in print or reformatted if needed */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 print:mt-8">
-        <Card className="p-8 bg-slate-900 text-white">
-          <h3 className="text-xl font-bold mb-6">Tu evolución</h3>
-          <p className="text-slate-300 mb-8">Veamos cómo ha cambiado tu nivel de certeza tras completar VocaRuta.</p>
-          
-          <div className="flex justify-between items-center mb-10">
-            <div className="text-center">
-              <div className="text-xs text-slate-400 uppercase tracking-widest mb-2">Antes</div>
-              <div className="w-16 h-16 rounded-full border-2 border-slate-600 flex items-center justify-center text-2xl font-bold">
-                {initialCertainty}/5
-              </div>
-            </div>
-            
-            <div className="flex-grow flex justify-center">
-              <ArrowRight className="text-slate-500 w-6 h-6" />
-            </div>
-
-            <div className="text-center">
-              <div className="text-xs text-primary-400 uppercase tracking-widest mb-2">Ahora</div>
-              <div className={clsx(
-                "w-16 h-16 rounded-full border-2 flex items-center justify-center text-2xl font-bold",
-                finalCertainty ? "border-primary-500 bg-primary-600" : "border-slate-600 border-dashed text-slate-500"
-              )}>
-                {finalCertainty ? `${finalCertainty}/5` : '?'}
-              </div>
-            </div>
+      {completed.length > 0 && (
+        <section>
+          <h2 className="text-xl font-bold text-slate-900 mb-4">Tu reflexión después de probar</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {completed.map(sim => {
+              const result = state.completedSimulations[sim.id];
+              const answers = result.answers || result;
+              const decision = Object.values(result.decisions || {})[0];
+              const selected = sim.steps.find(step => step.type === 'decision')?.options?.find(option => option.id === decision?.option);
+              return (
+                <Card key={sim.id} className="p-5 print:shadow-none break-inside-avoid">
+                  <h3 className="font-semibold text-slate-900 mb-3">{sim.title}</h3>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    <li>Disfrutaste resolverla: <strong>{responseLabel(answers.enjoy)}</strong></li>
+                    <li>Quieres aprender más: <strong>{responseLabel(answers.learn)}</strong></li>
+                    <li>Te interesó el problema: <strong>{responseLabel(answers.interest)}</strong></li>
+                    <li>Te imaginas haciendo tareas parecidas: <strong>{responseLabel(answers.future)}</strong></li>
+                  </ul>
+                  {selected && <p className="text-sm text-slate-700 mt-4"><strong>Opción que elegiste:</strong> {selected.text}</p>}
+                  {decision?.justification && <p className="text-sm text-slate-700 mt-2"><strong>Tu razón:</strong> {decision.justification}</p>}
+                  <p className="text-xs text-slate-500 mt-3">Estas respuestas reflejan tu impresión de un caso breve, no una evaluación profesional.</p>
+                </Card>
+              );
+            })}
           </div>
+        </section>
+      )}
 
-          {!finalCertainty && (
-            <div className="print:hidden animate-in slide-in-from-bottom-2">
-              <p className="text-sm font-medium text-center mb-4">Indica tu nivel de seguridad actual:</p>
-              <div className="flex gap-2 justify-center">
-                {[1, 2, 3, 4, 5].map(num => (
-                  <button
-                    key={num}
-                    onClick={() => handleCertaintyChange(num)}
-                    className="w-10 h-10 rounded-md bg-slate-800 text-slate-300 hover:bg-primary-600 hover:text-white transition-colors"
-                  >
-                    {num}
-                  </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="p-6 bg-slate-900 text-white print:bg-white print:text-slate-900 print:shadow-none">
+          <h2 className="text-xl font-bold mb-3">Seguridad al elegir</h2>
+          <p className="text-sm mb-5 opacity-80">Antes: {state.initialCertainty == null ? 'Sin respuesta' : `${state.initialCertainty}/5`} · Después: {finalCertainty == null ? 'Sin respuesta' : `${finalCertainty}/5`}</p>
+          {finalCertainty == null && (
+            <div className="print:hidden">
+              <p className="text-sm mb-3">¿Qué tan seguro te sientes ahora?</p>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map(value => (
+                  <button key={value} onClick={() => handleCertaintyChange(value)} className="w-10 h-10 rounded-md bg-slate-700 hover:bg-primary-600 text-white" aria-label={`Seguridad ${value} de 5`}>{value}</button>
                 ))}
               </div>
             </div>
           )}
+          <p className="text-xs mt-4 opacity-70">Este cambio indica percepción de seguridad, no calidad comprobada de la decisión.</p>
         </Card>
 
-        <Card className="p-8 border-primary-100 bg-primary-50 flex flex-col justify-center print:hidden">
-          <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 mb-4">
-            <Compass className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2">La decisión es tuya</h3>
-          <p className="text-slate-600 mb-6 leading-relaxed">
-            VocaRuta te ha dado datos objetivos, compatibilidad basada en tus respuestas y experiencia real. Tienes mejores argumentos para decidir.
-          </p>
-          <Button onClick={() => navigate(ROUTES.EXPLORE)} variant="outline" className="w-fit bg-white border-primary-200 text-primary-700 hover:bg-primary-50">
-            Seguir explorando carreras
-          </Button>
+        <Card className="p-6 border-primary-100 bg-primary-50 print:bg-white print:shadow-none">
+          <h2 className="text-xl font-bold text-slate-900 mb-3">Preguntas para seguir investigando</h2>
+          <ul className="space-y-2 text-sm text-slate-700 list-disc pl-5">
+            <li>¿Qué tareas te gustaron y cuáles preferirías evitar?</li>
+            <li>¿Qué carrera merece una entrevista con un estudiante o profesional?</li>
+            <li>¿Qué malla curricular, costos y opciones de financiamiento necesitas confirmar?</li>
+            <li>¿Qué fuentes actuales respaldan los datos de empleo e ingresos?</li>
+          </ul>
         </Card>
       </div>
 
-      {/* Share Modal */}
-      <Modal 
-        isOpen={showShareModal} 
-        onClose={() => setShowShareModal(false)}
-        title="Compartir con Padres / Tutores"
-      >
-        <div className="space-y-4">
-          <p className="text-slate-600 text-sm">
-            Ingresa el correo de tus padres para enviarles un acceso a tu reporte resumido.
-          </p>
-          <input 
-            type="email" 
-            placeholder="correo@ejemplo.com"
-            className="w-full h-12 rounded-lg border border-slate-300 px-4 focus:ring-2 focus:ring-primary-500 focus:outline-none"
-          />
-          <Button className="w-full" onClick={() => setShowShareModal(false)}>
-            Enviar Invitación
-          </Button>
-          <p className="text-xs text-center text-slate-400 mt-4">
-            (Esto es un prototipo visual, el correo no se enviará realmente)
-          </p>
+      <Card className="p-6 print:shadow-none">
+        <h2 className="text-xl font-bold text-slate-900 mb-3">Próximo paso recomendado</h2>
+        <p className="text-slate-700">Elige dos o tres alternativas y verifica sus mallas, costos vigentes y oportunidades laborales en fuentes actualizadas. Luego conversa con personas que estudian o ejercen esas profesiones.</p>
+        <div className="print:hidden mt-5 flex flex-wrap gap-3">
+          <Button onClick={() => navigate(ROUTES.EXPLORE)} variant="outline"><Compass className="w-4 h-4 mr-2" /> Seguir explorando</Button>
+          <Button onClick={() => navigate(ROUTES.COMPARE)} variant="outline"><CheckCircle2 className="w-4 h-4 mr-2" /> Revisar comparación <ArrowRight className="w-4 h-4 ml-2" /></Button>
         </div>
-      </Modal>
+      </Card>
 
-      {/* Print Footer */}
-      <div className="hidden print:block mt-12 text-center text-sm text-slate-400 pt-6 border-t border-slate-200">
-        Generado por VocaRuta - Plataforma de Orientación Vocacional | vocaruta.com
-      </div>
+      <p className="text-xs text-slate-500">Prototipo de prueba. Los perfiles de carreras y sus afinidades son ejemplos sin validación profesional; verifica información actual antes de decidir.</p>
     </div>
   );
 }

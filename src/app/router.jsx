@@ -2,11 +2,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import { ROUTES } from './routes';
 import PublicLayout from '../layouts/PublicLayout';
 import StudentLayout from '../layouts/StudentLayout';
-import SchoolLayout from '../layouts/SchoolLayout';
 
 import LandingPage from '../features/landing/LandingPage';
-import LoginPage from '../features/auth/LoginPage';
-import RegisterPage from '../features/auth/RegisterPage';
 import DashboardPage from '../features/dashboard/DashboardPage';
 import AssessmentPage from '../features/assessment/AssessmentPage';
 import ExplorePage from '../features/explore/ExplorePage';
@@ -15,7 +12,6 @@ import SimulationDetailPage from '../features/simulations/SimulationDetailPage';
 import ComparePage from '../features/compare/ComparePage';
 import ReportPage from '../features/report/ReportPage';
 import PricingPage from '../features/pricing/PricingPage';
-import SchoolPanelPage from '../features/school-panel/SchoolPanelPage';
 
 export const router = createBrowserRouter([
   {
@@ -23,8 +19,6 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       { index: true, element: <LandingPage /> },
-      { path: ROUTES.LOGIN, element: <LoginPage /> },
-      { path: ROUTES.REGISTER, element: <RegisterPage /> },
       { path: ROUTES.PRICING, element: <PricingPage /> },
     ],
   },
@@ -41,11 +35,4 @@ export const router = createBrowserRouter([
       { path: ROUTES.REPORT, element: <ReportPage /> },
     ],
   },
-  {
-    path: ROUTES.SCHOOL,
-    element: <SchoolLayout />,
-    children: [
-      { index: true, element: <SchoolPanelPage /> },
-    ],
-  }
 ]);

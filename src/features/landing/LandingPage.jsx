@@ -19,17 +19,17 @@ export default function LandingPage() {
             Descubre. Prueba. <span className="text-primary-600">Decide.</span>
           </h1>
           <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-            Antes de elegir una carrera, vive una parte de ella. Combina autoconocimiento y simulaciones reales para tomar la mejor decisión.
+            Explora opciones, prueba casos inspirados en distintas profesiones y reúne argumentos antes de elegir una carrera.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to={ROUTES.REGISTER}>
+            <Link to={ROUTES.DASHBOARD}>
               <Button className="h-14 px-8 text-lg w-full sm:w-auto shadow-sm">
-                Empieza gratis <ArrowRight className="ml-2 h-5 w-5" />
+                Probar el recorrido <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link to={ROUTES.SCHOOL}>
+            <Link to={ROUTES.PRICING}>
               <Button variant="outline" className="h-14 px-8 text-lg w-full sm:w-auto">
-                Para Colegios
+                Qué incluye el piloto
               </Button>
             </Link>
           </div>
@@ -38,21 +38,28 @@ export default function LandingPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-50 rounded-full blur-3xl -z-10 opacity-50"></div>
       </section>
 
+      <section className="py-8 bg-primary-50 border-y border-primary-100">
+        <Container className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-slate-800 text-center sm:text-left">Este piloto está pensado para estudiantes que quieren contrastar dos o más carreras antes de elegir.</p>
+          <Link to={ROUTES.PRICING} className="font-semibold text-primary-700 hover:text-primary-900 whitespace-nowrap">Ver el piloto →</Link>
+        </Container>
+      </section>
+
       {/* How it works */}
       <section id="como-funciona" className="py-20 bg-white border-y border-slate-100">
         <Container>
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Una ruta clara hacia tu futuro</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto">Sigue 5 etapas diseñadas para guiarte desde la incertidumbre hasta la decisión con argumentos sólidos.</p>
+            <p className="text-slate-500 max-w-2xl mx-auto">Sigue 5 etapas para contrastar tus ideas y reunir mejores argumentos antes de decidir.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
             {[
               { num: 1, title: 'Conócete', desc: 'Evalúa tus intereses, habilidades y valores.', icon: <Compass className="h-6 w-6 text-primary-600" /> },
-              { num: 2, title: 'Explora', desc: 'Recibe recomendaciones de carreras compatibles.', icon: <SearchIcon className="h-6 w-6 text-primary-600" /> },
-              { num: 3, title: 'Prueba', desc: 'Resuelve simulaciones prácticas de la vida real.', icon: <FlaskConical className="h-6 w-6 text-primary-600" /> },
-              { num: 4, title: 'Compara', desc: 'Analiza mercado, salarios y malla curricular.', icon: <BarChart3 className="h-6 w-6 text-primary-600" /> },
-              { num: 5, title: 'Decide', desc: 'Descarga un reporte integral para tu familia.', icon: <CheckCircle2 className="h-6 w-6 text-primary-600" /> }
+              { num: 2, title: 'Explora', desc: 'Revisa alternativas según tus respuestas.', icon: <SearchIcon className="h-6 w-6 text-primary-600" /> },
+              { num: 3, title: 'Prueba', desc: 'Resuelve casos inspirados en tareas profesionales.', icon: <FlaskConical className="h-6 w-6 text-primary-600" /> },
+              { num: 4, title: 'Compara', desc: 'Contrasta perfiles y cursos de ejemplo.', icon: <BarChart3 className="h-6 w-6 text-primary-600" /> },
+              { num: 5, title: 'Decide', desc: 'Guarda tu reporte personal y define próximos pasos.', icon: <CheckCircle2 className="h-6 w-6 text-primary-600" /> }
             ].map((step) => (
               <div key={step.num} className="relative flex flex-col items-center text-center">
                 <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-primary-100 z-10 relative">
@@ -77,13 +84,13 @@ export default function LandingPage() {
             <div>
               <h2 className="text-3xl font-bold text-slate-900 mb-6">Mucho más que un test vocacional</h2>
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                Los tests tradicionales solo te dicen qué eres. VocaRuta te permite experimentar la carrera antes de comprometerte 5 años de tu vida.
+                VocaRuta reúne preguntas sobre tus intereses, casos breves de carreras y una comparación para ayudarte a explorar antes de decidir.
               </p>
               <ul className="space-y-6">
                 {[
-                  { title: 'Simulaciones reales', desc: 'Resuelve problemas que un profesional enfrenta en su día a día.', icon: <Zap className="h-5 w-5 text-accent-500" /> },
-                  { title: 'Datos objetivos', desc: 'Información del mercado laboral para decisiones con los pies en la tierra.', icon: <BarChart3 className="h-5 w-5 text-accent-500" /> },
-                  { title: 'Reporte para padres', desc: 'Herramientas para alinear expectativas con tu familia.', icon: <ShieldCheck className="h-5 w-5 text-accent-500" /> }
+                  { title: 'Casos para explorar', desc: 'Prueba actividades breves inspiradas en situaciones profesionales.', icon: <Zap className="h-5 w-5 text-accent-500" /> },
+                  { title: 'Comparación clara', desc: 'Contrasta perfiles y cursos de ejemplo para saber qué información debes verificar.', icon: <BarChart3 className="h-5 w-5 text-accent-500" /> },
+                  { title: 'Reporte personal', desc: 'Resume qué probaste y qué necesitas confirmar antes de decidir.', icon: <ShieldCheck className="h-5 w-5 text-accent-500" /> }
                 ].map((item, i) => (
                   <li key={i} className="flex gap-4">
                     <div className="shrink-0 w-10 h-10 rounded-lg bg-white shadow-sm border border-slate-200 flex items-center justify-center">
@@ -129,10 +136,10 @@ export default function LandingPage() {
       <section className="py-24 bg-primary-900 text-white text-center">
         <Container className="max-w-3xl">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">¿Listo para encontrar tu ruta?</h2>
-          <p className="text-primary-200 text-lg mb-10">Crea tu cuenta gratuita y toma el control de tu futuro profesional hoy mismo.</p>
-          <Link to={ROUTES.REGISTER}>
+          <p className="text-primary-200 text-lg mb-10">Prueba este prototipo y descubre qué necesitas investigar antes de decidir.</p>
+          <Link to={ROUTES.DASHBOARD}>
             <Button variant="secondary" className="h-14 px-10 text-lg text-primary-900 bg-white hover:bg-slate-50 shadow-lg">
-              Empieza ahora
+              Probar el recorrido
             </Button>
           </Link>
         </Container>

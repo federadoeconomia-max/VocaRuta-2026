@@ -3,15 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../app/routes';
 import { useJourney } from '../../context/JourneyContext';
 import { careerService } from '../../services/careerService';
+import { simulationsData } from '../../data/simulations';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Table, TableHeader, TableRow, TableHead, TableCell } from '../../components/ui/Table';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Alert } from '../../components/ui/Alert';
-import { Badge } from '../../components/ui/Badge';
-import { Search, Info, Check, X } from 'lucide-react';
-import { clsx } from 'clsx';
+import { Search, Check, X } from 'lucide-react';
 
 export default function ComparePage() {
   const { state, dispatch } = useJourney();
@@ -21,7 +20,6 @@ export default function ComparePage() {
 
   useEffect(() => {
     if (state.compareList.length === 0) {
-      setLoading(false);
       return;
     }
 
@@ -41,9 +39,7 @@ export default function ComparePage() {
       });
   }, [state.compareList, state.recommendedCareers]);
 
-  if (loading) return <div className="p-8 text-center text-slate-500">Cargando comparador...</div>;
-
-  if (careers.length === 0) {
+  if (state.compareList.length === 0) {
     return (
       <div className="animate-in fade-in">
         <SectionHeader title="Compara opciones" />
@@ -57,20 +53,13 @@ export default function ComparePage() {
     );
   }
 
-  const getDemandColor = (demand) => {
-    switch(demand.toLowerCase()) {
-      case 'alta': return 'success';
-      case 'media': return 'warning';
-      case 'baja': return 'default';
-      default: return 'default';
-    }
-  };
+  if (loading) return <div className="p-8 text-center text-slate-500">Cargando comparador...</div>;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <SectionHeader 
         title="Compara lado a lado" 
-        description="Analiza los datos concretos de las carreras que más te interesan para tomar una decisión informada."
+        description="Contrasta perfiles y cursos de ejemplo. Verifica la información de cada institución antes de decidir."
         action={
           <Button onClick={() => {
             dispatch({ type: 'SET_STAGE', payload: Math.max(state.currentStage, 5) });
@@ -83,7 +72,7 @@ export default function ComparePage() {
 
       <Alert variant="info" className="mb-6">
         <span className="font-semibold">Nota: </span>
-        Todos los datos mostrados (salarios, pensiones, demanda) son datos referenciales de ejemplo y pueden variar por universidad o región.
+        Los perfiles y cursos son ejemplos para probar el recorrido. Aún no contamos con fuentes verificadas de salarios, pensiones o demanda por carrera.
       </Alert>
 
       <Card className="overflow-hidden">
@@ -127,39 +116,11 @@ export default function ComparePage() {
             </TableRow>
 
             <TableRow>
-              <TableCell className="font-medium bg-slate-50 border-r border-slate-200">Demanda Laboral <Info className="inline w-3 h-3 text-slate-400" /></TableCell>
-              {careers.map(career => (
-                <TableCell key={career.id} className="text-center">
-                  <Badge variant={getDemandColor(career.demand)}>{career.demand}</Badge>
-                </TableCell>
-              ))}
-              {[...Array(3 - careers.length)].map((_, i) => <TableCell key={`e3-${i}`} className="bg-slate-50/50" />)}
-            </TableRow>
-
-            <TableRow>
-              <TableCell className="font-medium bg-slate-50 border-r border-slate-200">Salario Referencial <br/><span className="text-xs text-slate-400 font-normal">Junior - Semi Senior</span></TableCell>
-              {careers.map(career => (
-                <TableCell key={career.id} className="text-center font-medium text-slate-700">
-                  {career.salaryRange}
-                </TableCell>
-              ))}
-              {[...Array(3 - careers.length)].map((_, i) => <TableCell key={`e4-${i}`} className="bg-slate-50/50" />)}
-            </TableRow>
-
-            <TableRow>
-              <TableCell className="font-medium bg-slate-50 border-r border-slate-200">Pensión Referencial <br/><span className="text-xs text-slate-400 font-normal">Universidades Privadas</span></TableCell>
-              {careers.map(career => (
-                <TableCell key={career.id} className="text-center text-slate-600">
-                  {career.tuitionRange}
-                </TableCell>
-              ))}
-              {[...Array(3 - careers.length)].map((_, i) => <TableCell key={`e5-${i}`} className="bg-slate-50/50" />)}
-            </TableRow>
-
-            <TableRow>
               <TableCell className="font-medium bg-slate-50 border-r border-slate-200 rounded-bl-lg">Simulación VocaRuta</TableCell>
               {careers.map(career => {
-                const hasSim = state.completedSimulations.hasOwnProperty(`sim-${career.id.substring(0,3)}`);
+                const simulations = simulationsData.filter(sim => sim.careerId === career.id);
+                const hasSim = simulations.some(sim => Boolean(state.completedSimulations[sim.id]));
+                const available = simulations.some(sim => sim.status === 'available');
                 return (
                   <TableCell key={career.id} className="text-center">
                     {hasSim ? (
@@ -167,8 +128,8 @@ export default function ComparePage() {
                         <Check className="w-4 h-4" /> Realizada
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center gap-1 text-slate-400 font-medium text-sm">
-                        <X className="w-4 h-4" /> Pendiente
+                      <span className="flex items-center justify-center gap-1 text-slate-500 font-medium text-sm">
+                        <X className="w-4 h-4" /> {available ? 'Pendiente' : 'Aún sin caso'}
                       </span>
                     )}
                   </TableCell>

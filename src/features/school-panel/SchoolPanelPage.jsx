@@ -27,11 +27,11 @@ export default function SchoolPanelPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Panel del Colegio</h1>
-          <p className="text-slate-500">Promoción 2026 - Colegio San Ignacio</p>
+          <p className="text-slate-500">Promoción ficticia para mostrar cómo podría funcionar el seguimiento</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
           <AlertCircle className="w-4 h-4 text-slate-400" /> 
-          Los datos se presentan de forma agregada. Datos de ejemplo.
+          Todos los datos y estudiantes de este panel son ficticios.
         </div>
       </div>
 
@@ -97,8 +97,8 @@ export default function SchoolPanelPage() {
         </Card>
 
         <Card className="p-6 bg-slate-900 text-white flex flex-col justify-center">
-          <h3 className="font-bold text-slate-100 mb-2">Impacto en la certeza de los estudiantes</h3>
-          <p className="text-slate-400 text-sm mb-8">Promedio del nivel de seguridad al elegir carrera de la promoción.</p>
+          <h3 className="font-bold text-slate-100 mb-2">Seguridad declarada al elegir</h3>
+          <p className="text-slate-400 text-sm mb-8">Ejemplo de cómo se mostraría el promedio antes y después del recorrido. No es un resultado medido.</p>
           
           <div className="flex items-center justify-between px-8">
             <div className="text-center">
@@ -124,7 +124,7 @@ export default function SchoolPanelPage() {
       {/* Student List */}
       <Card className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-slate-900">Directorio de Estudiantes</h3>
+          <h3 className="font-bold text-slate-900">Seguimiento de estudiantes de ejemplo</h3>
           <div className="w-64 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input 
@@ -139,7 +139,7 @@ export default function SchoolPanelPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nombre del Estudiante</TableHead>
+              <TableHead>Estudiante</TableHead>
               <TableHead>Progreso</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Principal Recomendación</TableHead>

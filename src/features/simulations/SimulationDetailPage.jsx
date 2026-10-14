@@ -8,21 +8,23 @@ import { Card } from '../../components/ui/Card';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { Badge } from '../../components/ui/Badge';
 import { clsx } from 'clsx';
-import { ArrowLeft, CheckCircle2, TrendingUp } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export default function SimulationDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { state, dispatch } = useJourney();
+  const { dispatch } = useJourney();
   
   const [simulation, setSimulation] = useState(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [decisions, setDecisions] = useState({});
+  const [justification, setJustification] = useState('');
   
   // Feedback state
   const [isFeedbackPhase, setIsFeedbackPhase] = useState(false);
   const [feedbackAnswers, setFeedbackAnswers] = useState({});
-  const [completedResult, setCompletedResult] = useState(null);
+  const [completedResult, setCompletedResult] = useState(false);
 
   useEffect(() => {
     simulationService.getSimulationById(id).then(data => {
@@ -37,38 +39,24 @@ export default function SimulationDetailPage() {
   const currentStep = steps[currentStepIndex];
 
   const handleNextStep = () => {
+    if (currentStep.type === 'decision') {
+      setDecisions(previous => ({ ...previous, [currentStep.id]: { option: selectedOption, justification: justification.trim() } }));
+    }
     if (currentStepIndex < steps.length - 1) {
       setCurrentStepIndex(prev => prev + 1);
       setSelectedOption(null); // Reset for next decision
+      setJustification('');
     } else {
       setIsFeedbackPhase(true);
     }
   };
 
   const handleFeedbackSubmit = () => {
-    // Calculate a mock score increase based on feedback
-    let score = 0;
-    Object.values(feedbackAnswers).forEach(val => { score += val; });
-    const boost = Math.round((score / 20) * 10); // max 10% boost
-
-    const career = state.recommendedCareers.find(c => c.id === simulation.careerId);
-    const oldCompat = career ? career.compatibility : 75;
-    const newCompat = Math.min(99, oldCompat + boost);
-
-    // Update global state
     dispatch({
       type: 'COMPLETE_SIMULATION',
-      payload: { simId: simulation.id, feedback: feedbackAnswers }
+      payload: { simId: simulation.id, feedback: { answers: feedbackAnswers, decisions } }
     });
-
-    if (career) {
-      const updatedCareers = state.recommendedCareers.map(c => 
-        c.id === career.id ? { ...c, compatibility: newCompat } : c
-      );
-      dispatch({ type: 'UPDATE_RECOMMENDED_CAREERS', payload: updatedCareers });
-    }
-
-    setCompletedResult({ oldCompat, newCompat });
+    setCompletedResult(true);
   };
 
   // --- RENDERS ---
@@ -81,18 +69,8 @@ export default function SimulationDetailPage() {
         </div>
         <h2 className="text-3xl font-bold text-slate-900 mb-4">Simulación Completada</h2>
         <p className="text-slate-600 mb-8">
-          Esta ha sido una primera aproximación práctica. Has sumado experiencia que mejora la precisión de tus resultados.
+          Esta fue una primera aproximación a tareas de la carrera. Tus respuestas quedarán en el reporte para conversar sobre lo que te interesó y lo que quieres seguir explorando.
         </p>
-
-        <Card className="p-6 bg-primary-50 border-primary-100 mb-8 max-w-sm mx-auto">
-          <div className="flex items-center justify-center gap-2 mb-2 text-primary-800 font-medium">
-            <TrendingUp className="w-5 h-5" /> Nueva Compatibilidad
-          </div>
-          <div className="flex items-center justify-center gap-4 text-3xl font-bold">
-            <span className="text-slate-400 line-through">{completedResult.oldCompat}%</span>
-            <span className="text-primary-600">{completedResult.newCompat}%</span>
-          </div>
-        </Card>
 
         <Button onClick={() => navigate(ROUTES.SIMULATIONS)} className="h-12 px-8">
           Volver a Simulaciones
@@ -113,7 +91,7 @@ export default function SimulationDetailPage() {
       <div className="max-w-2xl mx-auto py-8 animate-in fade-in">
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold text-slate-900">¿Qué te pareció?</h2>
-          <p className="text-slate-500 mt-2">Tu retroalimentación recalculará la compatibilidad con esta carrera.</p>
+          <p className="text-slate-500 mt-2">Tus respuestas aparecerán en tu reporte personal como pistas para seguir explorando.</p>
         </div>
 
         <Card className="p-8 space-y-8">
@@ -173,7 +151,7 @@ export default function SimulationDetailPage() {
           {currentStep.type === 'intro' && <Badge variant="primary" className="mb-4">Contexto</Badge>}
           {currentStep.type === 'data' && <Badge variant="warning" className="mb-4">Datos</Badge>}
           {currentStep.type === 'decision' && <Badge variant="success" className="mb-4">Decisión</Badge>}
-          {currentStep.type === 'feedback' && <Badge variant="default" className="mb-4">Retroalimentación del Experto</Badge>}
+          {currentStep.type === 'feedback' && <Badge variant="default" className="mb-4">Para reflexionar</Badge>}
           
           <p className="text-lg text-slate-800 leading-relaxed font-medium">
             {currentStep.content}
@@ -213,6 +191,8 @@ export default function SimulationDetailPage() {
           <div className="mb-8">
             <label className="block text-sm font-medium text-slate-700 mb-2">Justifica tu decisión (Opcional pero recomendado)</label>
             <textarea 
+              value={justification}
+              onChange={event => setJustification(event.target.value)}
               className="w-full h-24 rounded-lg border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
               placeholder="Basado en los datos presentados, considero que..."
             ></textarea>

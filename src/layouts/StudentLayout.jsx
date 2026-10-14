@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../app/routes';
-import { Button } from '../components/ui/Button';
 import { Stepper } from '../components/ui/Stepper';
 import { useJourney } from '../context/JourneyContext';
 

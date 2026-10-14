@@ -28,22 +28,17 @@ export default function AssessmentPage() {
   const currentQ = questions[currentIndex];
 
   const handleSelect = (val) => {
-    const newAnswers = { ...answers, [currentQ.id]: val };
-    setAnswers(newAnswers);
-    
-    // Auto advance after small delay for better UX
-    if (currentIndex < questions.length - 1) {
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 300);
-    }
+    setAnswers(previous => ({ ...previous, [currentQ.id]: val }));
   };
 
   const handleFinish = () => {
+    if (questions.some(q => answers[q.id] == null)) return;
     // Calculate dimension scores (average per dimension)
     const scores = {};
     const counts = {};
     
     questions.forEach(q => {
-      const val = answers[q.id] || 3;
+      const val = answers[q.id];
       scores[q.dimension] = (scores[q.dimension] || 0) + val;
       counts[q.dimension] = (counts[q.dimension] || 0) + 1;
     });
@@ -78,6 +73,10 @@ export default function AssessmentPage() {
         </Button>
       </div>
     );
+  }
+
+  if (!currentQ) {
+    return <div className="p-8 text-center text-slate-500">No hay preguntas disponibles en este momento.</div>;
   }
 
   return (
@@ -124,7 +123,7 @@ export default function AssessmentPage() {
       <div className="flex justify-between mt-8">
         <Button 
           variant="outline" 
-          onClick={() => setCurrentIndex(prev => prev - 1)}
+          onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
           disabled={currentIndex === 0}
         >
           <ArrowLeft className="mr-2 w-4 h-4" /> Anterior
@@ -139,7 +138,7 @@ export default function AssessmentPage() {
           </Button>
         ) : (
           <Button 
-            onClick={() => setCurrentIndex(prev => prev + 1)}
+            onClick={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))}
             disabled={!answers[currentQ.id]}
           >
             Siguiente <ArrowRight className="ml-2 w-4 h-4" />

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../app/routes';
 import { useJourney } from '../../context/JourneyContext';
@@ -11,18 +10,17 @@ import { clsx } from 'clsx';
 export default function DashboardPage() {
   const { state, dispatch } = useJourney();
   const navigate = useNavigate();
-  const [certainty, setCertainty] = useState(state.initialCertainty || 0);
+  const certainty = state.initialCertainty;
 
   const STAGES_INFO = [
     { id: 1, title: 'Conócete', desc: 'Descubre tus intereses y habilidades', route: ROUTES.ASSESSMENT, icon: <Compass className="w-5 h-5" /> },
     { id: 2, title: 'Explora', desc: 'Revisa tus carreras compatibles', route: ROUTES.EXPLORE, icon: <Search className="w-5 h-5" /> },
-    { id: 3, title: 'Prueba', desc: 'Vive simulaciones reales', route: ROUTES.SIMULATIONS, icon: <FlaskConical className="w-5 h-5" /> },
-    { id: 4, title: 'Compara', desc: 'Analiza mercado y datos', route: ROUTES.COMPARE, icon: <BarChart3 className="w-5 h-5" /> },
+    { id: 3, title: 'Prueba', desc: 'Explora casos de carreras', route: ROUTES.SIMULATIONS, icon: <FlaskConical className="w-5 h-5" /> },
+    { id: 4, title: 'Compara', desc: 'Contrasta carreras y cursos de ejemplo', route: ROUTES.COMPARE, icon: <BarChart3 className="w-5 h-5" /> },
     { id: 5, title: 'Decide', desc: 'Obtén tu reporte final', route: ROUTES.REPORT, icon: <CheckCircle className="w-5 h-5" /> },
   ];
 
   const handleSetCertainty = (val) => {
-    setCertainty(val);
     dispatch({ type: 'SET_INITIAL_CERTAINTY', payload: val });
   };
 
@@ -34,8 +32,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <SectionHeader 
-        title="Hola, Estudiante" 
-        description="Bienvenido a tu ruta de orientación vocacional."
+        title="Tu ruta vocacional"
+        description="Explora opciones, prueba tareas y reúne argumentos para elegir. Tu avance queda guardado en este navegador."
       />
 
       {state.initialCertainty === null && (
@@ -111,6 +109,11 @@ export default function DashboardPage() {
           <ArrowRight className="ml-2 w-5 h-5" />
         </Button>
       </div>
+      {state.currentStage > 1 && (
+        <button type="button" onClick={() => dispatch({ type: 'RESET_JOURNEY' })} className="text-sm text-slate-500 underline hover:text-slate-800 self-start">
+          Borrar mi avance y empezar de nuevo
+        </button>
+      )}
     </div>
   );
 }
